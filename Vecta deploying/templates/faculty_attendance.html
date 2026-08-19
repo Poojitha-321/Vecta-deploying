@@ -1,0 +1,93 @@
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='faculty.css') }}">
+{% extends "faculty_base.html" %}
+
+{% block title %}
+Attendance | Faculty Portal
+{% endblock %}
+
+
+{% block content %}
+
+<div class="attendance-page">
+
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="section-label">
+                FACULTY ANALYTICS
+            </span>
+
+            <h1>
+                Attendance
+            </h1>
+
+            <p>
+                Select a department to view student attendance.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="attendance-filter-card">
+
+        <form
+            method="GET"
+            action="{{ url_for('department_attendance') }}"
+        >
+
+            <div class="attendance-filter-grid">
+
+                <div class="form-field">
+
+                    <label>
+                        Department
+                    </label>
+
+                    <select
+                        name="department"
+                        required
+                    >
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                        {% for department in departments %}
+
+                        <option value="{{ department }}">
+                            {{ department }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-field button-field">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        View Attendance
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

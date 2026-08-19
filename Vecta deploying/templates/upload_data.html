@@ -1,0 +1,1006 @@
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='faculty.css') }}">
+{% extends "faculty_base.html" %}
+
+{% block content %}
+
+<div class="upload-page">
+
+    <div class="page-header">
+
+        <div>
+            <span class="page-kicker">
+                FACULTY PORTAL
+            </span>
+
+            <h1>
+                Upload Attendance Data
+            </h1>
+
+            <p>
+                Upload student attendance data and predict attendance for future months.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         UPLOAD FORM
+         ========================================================= -->
+
+    <div class="upload-card">
+
+        <form
+            id="uploadForm"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <div class="form-group">
+
+                <label for="file">
+                    Attendance Excel File
+                </label>
+
+                <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    accept=".xlsx,.xls"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="prediction_count">
+                    Predict Attendance For
+                </label>
+
+                <select
+                    id="prediction_count"
+                    name="prediction_count"
+                    required
+                >
+
+                    <option value="1"
+                        {% if prediction_count == 1 %}
+                        selected
+                        {% endif %}
+                    >
+                        Next 1 Month
+                    </option>
+
+                    <option value="2"
+                        {% if prediction_count == 2 %}
+                        selected
+                        {% endif %}
+                    >
+                        Next 2 Months
+                    </option>
+
+                    <option value="3"
+                        {% if prediction_count == 3 %}
+                        selected
+                        {% endif %}
+                    >
+                        Next 3 Months
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="submit"
+                id="uploadButton"
+                class="upload-button"
+            >
+                <span id="buttonText">
+                    Upload & Predict
+                </span>
+
+                <span
+                    id="buttonSpinner"
+                    class="button-spinner"
+                ></span>
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================================================
+         ERROR
+         ========================================================= -->
+
+    {% if error %}
+
+    <div class="alert-error">
+
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         PREDICTION RESULTS
+         ========================================================= -->
+
+    {% if result %}
+
+    <div class="results-card">
+
+        <div class="results-header">
+
+            <div>
+
+                <h2>
+                    Prediction Results
+                </h2>
+
+                <p>
+
+                    Predicted attendance for
+
+                    {% if selected_months %}
+
+                        {% for month in selected_months %}
+
+                            <strong>
+                                {{ month.strftime("%B %Y") }}
+                            </strong>
+
+                            {% if not loop.last %}
+                                ,
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div class="student-count">
+
+                {{ result|length }} Students
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Student ID
+                        </th>
+
+                        <th>
+                            Roll No
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Year
+                        </th>
+
+                        <th>
+                            Current Attendance
+                        </th>
+
+
+                        {% if selected_months %}
+
+                            {% for month in selected_months %}
+
+                            <th>
+                                {{ month.strftime("%B %Y") }}
+                            </th>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for student in result %}
+
+                    <tr>
+
+                        <td>
+                            {{ student.get("Student_ID", "--") }}
+                        </td>
+
+                        <td>
+                            {{ student.get("Roll_No", "--") }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ student.get("Name", "--") }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ student.get("Department", "--") }}
+                        </td>
+
+                        <td>
+                            {{ student.get("Year", "--") }}
+                        </td>
+
+                        <td>
+
+                            {% if student.get("Current_Attendance") is not none %}
+
+                                {{ student.get("Current_Attendance") }}%
+
+                            {% else %}
+
+                                --
+
+                            {% endif %}
+
+                        </td>
+
+
+                        {% if selected_months %}
+
+                            {% for month in selected_months %}
+
+                                {% set month_key = "Prediction_" + month.strftime("%Y_%m") %}
+
+                                <td>
+
+                                    {% if student.get(month_key) is not none %}
+
+                                        <strong>
+                                            {{ student.get(month_key) }}%
+                                        </strong>
+
+                                    {% else %}
+
+                                        --
+
+                                    {% endif %}
+
+                                </td>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             DOWNLOAD BUTTON
+             ===================================================== -->
+
+        <div class="download-section">
+
+            <a
+                href="{{ url_for('download_predictions') }}"
+                class="download-button"
+            >
+                ⬇ Download Predicted Excel
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =============================================================
+     LOADING OVERLAY
+     ============================================================= -->
+
+<div
+    id="loadingOverlay"
+    class="loading-overlay"
+>
+
+    <div class="loading-box">
+
+        <div class="loader"></div>
+
+        <h2>
+            Processing Attendance Data
+        </h2>
+
+        <p>
+            Please wait while the prediction model is running.
+        </p>
+
+        <p class="loading-note">
+            This may take a few minutes for large datasets.
+        </p>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+.upload-page {
+
+    width: 100%;
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding: 20px 30px 50px;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.page-header {
+
+    margin-bottom: 30px;
+}
+
+.page-kicker {
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+}
+
+.page-header h1 {
+
+    margin: 7px 0;
+
+    font-size: 32px;
+
+    font-weight: 800;
+
+}
+
+.page-header p {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+
+}
+
+
+/* ============================================================
+   UPLOAD CARD
+   ============================================================ */
+
+.upload-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.07);
+
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.form-group {
+
+    margin-bottom: 22px;
+
+}
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 9px;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    color: #334155;
+
+}
+
+
+.form-group input[type="file"] {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+}
+
+
+.form-group select {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+
+}
+
+
+/* ============================================================
+   UPLOAD BUTTON
+   ============================================================ */
+
+.upload-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 13px 24px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+
+}
+
+
+.upload-button:hover {
+
+    background: #1e293b;
+
+}
+
+
+.upload-button:disabled {
+
+    opacity: 0.75;
+
+    cursor: not-allowed;
+
+}
+
+
+/* ============================================================
+   SMALL BUTTON SPINNER
+   ============================================================ */
+
+.button-spinner {
+
+    display: none;
+
+    width: 16px;
+
+    height: 16px;
+
+    border: 2px solid rgba(255,255,255,0.4);
+
+    border-top: 2px solid #ffffff;
+
+    border-radius: 50%;
+
+    animation: spin 0.8s linear infinite;
+
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.alert-error {
+
+    margin-top: 22px;
+
+    padding: 16px 18px;
+
+    border-radius: 12px;
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+
+.results-card {
+
+    margin-top: 30px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.07);
+
+}
+
+
+.results-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 24px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+
+.results-header h2 {
+
+    margin: 0;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+}
+
+
+.results-header p {
+
+    margin: 6px 0 0;
+
+    color: #64748b;
+
+}
+
+
+.student-count {
+
+    padding: 11px 16px;
+
+    border-radius: 10px;
+
+    background: #f1f5f9;
+
+    font-weight: 800;
+
+}
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.table-container {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+table {
+
+    width: 100%;
+
+    min-width: 900px;
+
+    border-collapse: collapse;
+
+}
+
+
+th {
+
+    padding: 14px 16px;
+
+    background: #f8fafc;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    color: #475569;
+
+    white-space: nowrap;
+
+}
+
+
+td {
+
+    padding: 15px 16px;
+
+    border-top: 1px solid #eef2f7;
+
+    font-size: 14px;
+
+    color: #334155;
+
+    white-space: nowrap;
+
+}
+
+
+tbody tr:hover {
+
+    background: #f8fafc;
+
+}
+
+
+/* ============================================================
+   DOWNLOAD
+   ============================================================ */
+
+.download-section {
+
+    padding: 22px 24px;
+
+    border-top: 1px solid #e2e8f0;
+
+}
+
+
+.download-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-weight: 800;
+
+    transition: 0.2s ease;
+
+}
+
+
+.download-button:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+/* ============================================================
+   FULL SCREEN LOADING OVERLAY
+   ============================================================ */
+
+.loading-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 99999;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(15, 23, 42, 0.72);
+
+    backdrop-filter: blur(4px);
+
+}
+
+
+/* ============================================================
+   LOADING BOX
+   ============================================================ */
+
+.loading-box {
+
+    width: min(430px, 90%);
+
+    padding: 40px 30px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.25);
+
+}
+
+
+.loading-box h2 {
+
+    margin: 20px 0 8px;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    color: #111827;
+
+}
+
+
+.loading-box p {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+}
+
+
+.loading-note {
+
+    margin-top: 8px !important;
+
+    font-size: 13px !important;
+
+    color: #94a3b8 !important;
+
+}
+
+
+/* ============================================================
+   LARGE LOADER
+   ============================================================ */
+
+.loader {
+
+    width: 60px;
+
+    height: 60px;
+
+    margin: 0 auto;
+
+    border: 6px solid #e5e7eb;
+
+    border-top: 6px solid #2563eb;
+
+    border-radius: 50%;
+
+    animation: spin 0.9s linear infinite;
+
+}
+
+
+/* ============================================================
+   ANIMATION
+   ============================================================ */
+
+@keyframes spin {
+
+    from {
+
+        transform: rotate(0deg);
+
+    }
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+    .upload-page {
+
+        padding: 15px;
+
+    }
+
+    .results-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+}
+
+</style>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "uploadForm"
+            );
+
+        const overlay =
+            document.getElementById(
+                "loadingOverlay"
+            );
+
+        const button =
+            document.getElementById(
+                "uploadButton"
+            );
+
+        const buttonText =
+            document.getElementById(
+                "buttonText"
+            );
+
+        const buttonSpinner =
+            document.getElementById(
+                "buttonSpinner"
+            );
+
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+                /*
+                 * Show loading screen immediately
+                 * when Upload & Predict is clicked.
+                 */
+
+                overlay.style.display =
+                    "flex";
+
+
+                /*
+                 * Prevent clicking the
+                 * button multiple times.
+                 */
+
+                button.disabled =
+                    true;
+
+
+                /*
+                 * Change button text.
+                 */
+
+                buttonText.textContent =
+                    "Processing...";
+
+
+                /*
+                 * Show small spinner
+                 * inside button.
+                 */
+
+                buttonSpinner.style.display =
+                    "inline-block";
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

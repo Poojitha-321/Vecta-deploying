@@ -1,0 +1,1090 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="profile-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="profile-header">
+
+        <div>
+
+            <span class="profile-eyebrow">
+                STUDENT PROFILE
+            </span>
+
+            <h1>
+                My Profile
+            </h1>
+
+            <p>
+                View your registered student information
+            </p>
+
+        </div>
+
+
+        <div class="profile-id-badge">
+
+            {{ student["Student_ID"] }}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN PROFILE CARD
+         ===================================================== -->
+
+    <div class="profile-main-card">
+
+
+        <!-- =================================================
+             STUDENT INTRODUCTION
+             ================================================= -->
+
+        <div class="student-intro">
+
+
+            <div class="student-avatar">
+
+                {{ student["Name"][0] | upper }}
+
+            </div>
+
+
+            <div class="student-intro-text">
+
+                <h2>
+                    {{ student["Name"] }}
+                </h2>
+
+                <p>
+                    Student ID:
+                    <strong>
+                        {{ student["Student_ID"] }}
+                    </strong>
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             PERSONAL INFORMATION
+             ================================================= -->
+
+        <div class="profile-section">
+
+
+            <div class="section-title">
+
+                <div class="section-accent"></div>
+
+                <div>
+
+                    <h3>
+                        Personal Information
+                    </h3>
+
+                    <p>
+                        Basic details registered in the student database
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-grid">
+
+
+                <!-- STUDENT ID -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Student ID
+                        </span>
+
+                        <strong class="info-value">
+                            {{ student["Student_ID"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ROLL NUMBER -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Roll Number
+                        </span>
+
+                        <strong class="info-value">
+                            {{ student["Roll_No"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NAME -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Full Name
+                        </span>
+
+                        <strong class="info-value">
+                            {{ student["Name"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Email Address
+                        </span>
+
+                        <strong class="info-value email-value">
+                            {{ student["Email"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DATE OF BIRTH -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Date of Birth
+                        </span>
+
+                        <strong class="info-value">
+                            {{ student["DOB"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GENDER -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Gender
+                        </span>
+
+                        <strong class="info-value gender-value">
+                            {{ student["Gender"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACADEMIC INFORMATION
+             ================================================= -->
+
+        <div class="profile-section academic-section">
+
+
+            <div class="section-title">
+
+                <div class="section-accent"></div>
+
+                <div>
+
+                    <h3>
+                        Academic Information
+                    </h3>
+
+                    <p>
+                        Current academic details
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-grid academic-grid">
+
+
+                <!-- DEPARTMENT -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Department
+                        </span>
+
+                        <strong class="info-value">
+                            {{ student["Department"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- YEAR -->
+
+                <div class="profile-info-card">
+
+                    <div class="info-accent"></div>
+
+                    <div class="info-content">
+
+                        <span class="info-label">
+                            Academic Year
+                        </span>
+
+                        <strong class="info-value">
+                            {{ student["Year"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PROFILE STATUS
+             ================================================= -->
+
+        <div class="profile-status">
+
+            <div class="status-indicator"></div>
+
+            <div>
+
+                <strong>
+                    Student Profile Active
+                </strong>
+
+                <p>
+                    Your profile information is loaded from the student database.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTION BUTTONS
+             ================================================= -->
+
+        <div class="profile-actions">
+
+
+            <a
+                href="{{ url_for('prediction') }}"
+                class="profile-action primary-action"
+            >
+                Attendance Prediction
+            </a>
+
+
+            <a
+                href="{{ url_for('student_dashboard') }}"
+                class="profile-action secondary-action"
+            >
+                View Dashboard
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   PROFILE PAGE
+   ========================================================= */
+
+.profile-page {
+
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 30px 35px 50px;
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.profile-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.profile-eyebrow {
+
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.8px;
+
+    color: #2563eb;
+
+}
+
+
+.profile-header h1 {
+
+    margin: 0;
+
+    font-size: 32px;
+
+    font-weight: 800;
+
+    color: #172033;
+
+}
+
+
+.profile-header p {
+
+    margin: 7px 0 0;
+
+    font-size: 15px;
+
+    color: #6b7280;
+
+}
+
+
+/* =========================================================
+   STUDENT ID BADGE
+   ========================================================= */
+
+.profile-id-badge {
+
+    padding: 11px 20px;
+
+    border-radius: 9px;
+
+    background: #f8fbff;
+
+    border: 1px solid #dbeafe;
+
+    color: #1d4ed8;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   MAIN PROFILE CARD
+   ========================================================= */
+
+.profile-main-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 4px 16px rgba(15, 23, 42, 0.05);
+
+}
+
+
+/* =========================================================
+   STUDENT INTRO
+   ========================================================= */
+
+.student-intro {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding-bottom: 28px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    margin-bottom: 30px;
+
+}
+
+
+.student-avatar {
+
+    width: 72px;
+
+    height: 72px;
+
+    min-width: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 28px;
+
+    font-weight: 800;
+
+}
+
+
+.student-intro-text h2 {
+
+    margin: 0;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+    color: #111827;
+
+}
+
+
+.student-intro-text p {
+
+    margin: 7px 0 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+}
+
+
+.student-intro-text strong {
+
+    color: #2563eb;
+
+}
+
+
+/* =========================================================
+   PROFILE SECTION
+   ========================================================= */
+
+.profile-section {
+
+    margin-bottom: 32px;
+
+}
+
+
+.section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.section-accent {
+
+    width: 4px;
+
+    height: 43px;
+
+    min-width: 4px;
+
+    border-radius: 4px;
+
+    background: #2563eb;
+
+}
+
+
+.section-title h3 {
+
+    margin: 0;
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+    color: #1f2937;
+
+}
+
+
+.section-title p {
+
+    margin: 4px 0 0;
+
+    color: #9ca3af;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   PROFILE GRID
+   ========================================================= */
+
+.profile-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+
+}
+
+
+/* =========================================================
+   INFORMATION CARD
+   ========================================================= */
+
+.profile-info-card {
+
+    min-height: 92px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 18px;
+
+    background: #fafcff;
+
+    border: 1px solid #e5eaf1;
+
+    border-radius: 10px;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+.profile-info-card:hover {
+
+    transform: translateY(-2px);
+
+    border-color: #bfdbfe;
+
+    box-shadow:
+        0 6px 18px rgba(15, 23, 42, 0.06);
+
+}
+
+
+/* =========================================================
+   CARD ACCENT
+   ========================================================= */
+
+.info-accent {
+
+    width: 4px;
+
+    height: 42px;
+
+    min-width: 4px;
+
+    border-radius: 4px;
+
+    background: #2563eb;
+
+}
+
+
+/* Different professional blue shades */
+
+.profile-info-card:nth-child(2)
+.info-accent {
+
+    background: #3b82f6;
+
+}
+
+
+.profile-info-card:nth-child(3)
+.info-accent {
+
+    background: #60a5fa;
+
+}
+
+
+.profile-info-card:nth-child(4)
+.info-accent {
+
+    background: #2563eb;
+
+}
+
+
+.profile-info-card:nth-child(5)
+.info-accent {
+
+    background: #1d4ed8;
+
+}
+
+
+.profile-info-card:nth-child(6)
+.info-accent {
+
+    background: #0ea5e9;
+
+}
+
+
+/* =========================================================
+   INFORMATION CONTENT
+   ========================================================= */
+
+.info-content {
+
+    min-width: 0;
+
+}
+
+
+.info-label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.7px;
+
+}
+
+
+.info-value {
+
+    display: block;
+
+    color: #111827;
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+
+}
+
+
+.email-value {
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   ACADEMIC SECTION
+   ========================================================= */
+
+.academic-section {
+
+    padding-top: 4px;
+
+}
+
+
+.academic-grid {
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+}
+
+
+/* =========================================================
+   PROFILE STATUS
+   ========================================================= */
+
+.profile-status {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 17px 20px;
+
+    margin-top: 5px;
+
+    margin-bottom: 25px;
+
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    border: 1px solid #dbe3ec;
+
+    border-left: 4px solid #16a34a;
+
+}
+
+
+.status-indicator {
+
+    width: 10px;
+
+    height: 10px;
+
+    min-width: 10px;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+
+}
+
+
+.profile-status strong {
+
+    display: block;
+
+    color: #166534;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+}
+
+
+.profile-status p {
+
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.profile-actions {
+
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.profile-action {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 44px;
+
+    padding: 0 21px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.profile-action:hover {
+
+    transform: translateY(-1px);
+
+}
+
+
+.primary-action {
+
+    color: #ffffff;
+
+    background: #2563eb;
+
+    border: 1px solid #2563eb;
+
+}
+
+
+.primary-action:hover {
+
+    background: #1d4ed8;
+
+    border-color: #1d4ed8;
+
+}
+
+
+.secondary-action {
+
+    color: #374151;
+
+    background: #ffffff;
+
+    border: 1px solid #d1d5db;
+
+}
+
+
+.secondary-action:hover {
+
+    color: #2563eb;
+
+    border-color: #93c5fd;
+
+    background: #f8fbff;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    .profile-page {
+
+        padding: 25px 20px 40px;
+
+    }
+
+
+    .profile-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .profile-grid,
+
+    .academic-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .profile-main-card {
+
+        padding: 22px;
+
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .profile-header h1 {
+
+        font-size: 26px;
+
+    }
+
+
+    .student-intro {
+
+        align-items: flex-start;
+
+    }
+
+
+    .student-avatar {
+
+        width: 60px;
+
+        height: 60px;
+
+        min-width: 60px;
+
+        border-radius: 14px;
+
+        font-size: 24px;
+
+    }
+
+
+    .student-intro-text h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    .profile-info-card {
+
+        padding: 15px;
+
+    }
+
+
+    .profile-actions {
+
+        flex-direction: column;
+
+    }
+
+
+    .profile-action {
+
+        width: 100%;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}

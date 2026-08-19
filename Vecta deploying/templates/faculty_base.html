@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Attendance AI
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='faculty.css') }}"
+    >
+
+    {% block extra_css %}
+    {% endblock %}
+
+
+    <!-- =====================================================
+         FACULTY SIDEBAR
+         ATTENDANCE + COMMON NAVIGATION STYLE
+         ===================================================== -->
+
+    <style>
+
+        /* =====================================================
+           MAIN SIDEBAR NAVIGATION
+        ===================================================== */
+
+        .sidebar-nav {
+            width: 100%;
+        }
+
+
+        /* All main navigation items */
+
+        .sidebar-nav > a,
+        .nav-parent {
+
+            width: 100%;
+            min-height: 48px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 16px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: transparent;
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            box-sizing: border-box;
+
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        /* =====================================================
+           ICON
+        ===================================================== */
+
+        .sidebar-nav .nav-icon {
+
+            width: 24px;
+            min-width: 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-right: 12px;
+
+            font-size: 16px;
+        }
+
+
+        /* =====================================================
+           MAIN NAVIGATION HOVER
+        ===================================================== */
+
+        .sidebar-nav > a:hover,
+        .nav-parent:hover {
+
+            background: rgba(37, 99, 235, 0.20);
+
+            color: #ffffff;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.10);
+        }
+
+
+        /* =====================================================
+           ACTIVE MAIN NAVIGATION
+        ===================================================== */
+
+        .sidebar-nav > a.active,
+        .nav-parent.active {
+
+            background: #2563eb;
+
+            color: #ffffff;
+
+            box-shadow:
+                0 5px 14px rgba(37, 99, 235, 0.30);
+        }
+
+
+        /* Keep active text white */
+
+        .sidebar-nav > a.active span,
+        .nav-parent.active span {
+
+            color: #ffffff;
+        }
+
+
+        /* =====================================================
+           ATTENDANCE GROUP
+        ===================================================== */
+
+        .nav-group {
+
+            width: 100%;
+        }
+
+
+        /* Attendance parent */
+
+        .nav-parent {
+
+            position: relative;
+        }
+
+
+        /* Attendance text */
+
+        .nav-parent .nav-text {
+
+            flex: 1;
+
+            color: #ffffff;
+        }
+
+
+        /* Attendance arrow */
+
+        .nav-parent .nav-arrow {
+
+            margin-left: auto;
+
+            color: #ffffff;
+
+            font-size: 13px;
+
+            transition:
+                transform 0.2s ease;
+        }
+
+
+        /* Arrow rotation */
+
+        .nav-parent .nav-arrow.rotate {
+
+            transform: rotate(180deg);
+        }
+
+
+        /* =====================================================
+           ATTENDANCE SUBMENU
+        ===================================================== */
+
+        .nav-submenu {
+
+            display: none;
+
+            width: 100%;
+
+            padding-left: 36px;
+
+            margin-top: 5px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* Open submenu */
+
+        .nav-submenu.open {
+
+            display: block;
+        }
+
+
+        /* =====================================================
+           SUBMENU LINKS
+        ===================================================== */
+
+        .nav-submenu a {
+
+            width: 100%;
+            min-height: 40px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 14px;
+
+            margin-bottom: 4px;
+
+            border-radius: 8px;
+
+            color: #ffffff;
+
+            background: transparent;
+
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            box-sizing: border-box;
+
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+
+        /* Submenu hover */
+
+        .nav-submenu a:hover {
+
+            background: rgba(37, 99, 235, 0.20);
+
+            color: #ffffff;
+
+            box-shadow:
+                0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+
+        /* Submenu active */
+
+        .nav-submenu a.active {
+
+            background: #2563eb;
+
+            color: #ffffff;
+
+            font-weight: 600;
+
+            box-shadow:
+                0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+
+        .nav-submenu a.active span {
+
+            color: #ffffff;
+        }
+
+
+        /* =====================================================
+           NAVIGATION CONSISTENT SIZE
+        ===================================================== */
+
+        .sidebar-nav > a {
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        .sidebar-nav > a span:not(.nav-icon) {
+
+            line-height: 1;
+        }
+
+
+        /* =====================================================
+           LOGOUT
+        ===================================================== */
+
+        .sidebar-bottom a {
+
+            color: #ffffff;
+        }
+
+
+        .sidebar-bottom a:hover {
+
+            background: rgba(37, 99, 235, 0.20);
+
+            color: #ffffff;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.10);
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="portal-layout">
+
+
+    <!-- =====================================================
+         FACULTY SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="sidebar-brand">
+
+            <div class="sidebar-logo">
+                AI
+            </div>
+
+            <div>
+
+                <h2>
+                    VECTA
+                </h2>
+
+                <span>
+                    Faculty Portal
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             NAVIGATION
+             ================================================= -->
+
+        <nav class="sidebar-nav">
+
+
+            <!-- HOME -->
+
+            <a
+                href="{{ url_for('faculty_home') }}"
+                class="{% if request.endpoint == 'faculty_home' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🏠
+                </span>
+
+                <span>
+                    Home
+                </span>
+
+            </a>
+
+
+            <!-- =================================================
+                 ATTENDANCE
+                 ================================================= -->
+
+            <div class="nav-group">
+
+                <div
+                    id="attendanceParent"
+                    class="nav-parent {% if request.endpoint in ['faculty_attendance', 'department_attendance', 'faculty_overall_prediction'] %}active{% endif %}"
+                    onclick="toggleFacultyAttendance()"
+                >
+
+                    <span class="nav-icon">
+                        📋
+                    </span>
+
+                    <span class="nav-text">
+                        Attendance
+                    </span>
+
+                    <span
+                        id="attendanceArrow"
+                        class="nav-arrow"
+                    >
+                        ▾
+                    </span>
+
+                </div>
+
+
+                <!-- SUBMENU -->
+
+                <div
+                    id="attendanceSubmenu"
+                    class="nav-submenu"
+                >
+
+
+                    <!-- BY DEPARTMENT -->
+
+                    <a
+                        href="{{ url_for('faculty_attendance') }}"
+                        class="{% if request.endpoint in ['faculty_attendance', 'department_attendance'] %}active{% endif %}"
+                    >
+
+                        <span>
+                            By Department
+                        </span>
+
+                    </a>
+
+
+                    <!-- OVERALL PREDICTION -->
+
+                    <a
+                        href="{{ url_for('faculty_overall_prediction') }}"
+                        class="{% if request.endpoint == 'faculty_overall_prediction' %}active{% endif %}"
+                    >
+
+                        <span>
+                            Overall Prediction
+                        </span>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DASHBOARD
+                 ================================================= -->
+
+            <a
+                href="{{ url_for('faculty_dashboard') }}"
+                class="{% if request.endpoint == 'faculty_dashboard' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📊
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <!-- =================================================
+                 UPLOAD DATA
+                 ================================================= -->
+
+            <a
+                href="{{ url_for('upload_data') }}"
+                class="{% if request.endpoint == 'upload_data' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ⬆
+                </span>
+
+                <span>
+                    Upload Data
+                </span>
+
+            </a>
+
+
+            <!-- =================================================
+                 ADD STUDENT
+                 ================================================= -->
+
+            <a
+                href="{{ url_for('add_student') }}"
+                class="{% if request.endpoint == 'add_student' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ➕
+                </span>
+
+                <span>
+                    Add New Student
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- =====================================================
+             LOGOUT
+             ===================================================== -->
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}">
+
+                <span class="nav-icon">
+                    ↪
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <div class="page-container">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+</div>
+
+
+{% block scripts %}
+{% endblock %}
+
+
+<!-- =====================================================
+     ATTENDANCE JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+function toggleFacultyAttendance() {
+
+    const menu =
+        document.getElementById("attendanceSubmenu");
+
+    const arrow =
+        document.getElementById("attendanceArrow");
+
+    if (!menu || !arrow) {
+        return;
+    }
+
+    menu.classList.toggle("open");
+
+    arrow.classList.toggle("rotate");
+
+}
+
+
+/* =====================================================
+   KEEP ATTENDANCE OPEN ON ATTENDANCE PAGES
+   ===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const attendanceParent =
+        document.getElementById("attendanceParent");
+
+    const attendanceSubmenu =
+        document.getElementById("attendanceSubmenu");
+
+    const attendanceArrow =
+        document.getElementById("attendanceArrow");
+
+
+    if (
+        !attendanceParent ||
+        !attendanceSubmenu ||
+        !attendanceArrow
+    ) {
+
+        return;
+
+    }
+
+
+    /* Open Attendance automatically
+       when one of its pages is active */
+
+    if (
+        attendanceParent.classList.contains("active")
+    ) {
+
+        attendanceSubmenu.classList.add("open");
+
+        attendanceArrow.classList.add("rotate");
+
+    }
+
+});
+
+</script>
+
+
+</body>
+
+</html>

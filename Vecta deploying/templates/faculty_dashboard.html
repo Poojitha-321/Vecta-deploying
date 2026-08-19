@@ -1,0 +1,2569 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='faculty.css') }}">
+
+<div class="faculty-dashboard-page">
+
+<!-- ================================================= -->
+<!-- HEADER -->
+<!-- ================================================= -->
+
+<div class="dashboard-header">
+
+    <div>
+
+        <span class="page-kicker">
+            FACULTY PORTAL
+        </span>
+
+        <h1>
+            Department Dashboard
+        </h1>
+
+        <p>
+            Select a department to view attendance,
+            predictions and student performance.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- DEPARTMENT SELECTOR -->
+<!-- ================================================= -->
+
+<div class="department-selector-card">
+
+    <div class="selector-content">
+
+        <div>
+
+            <span class="selector-label">
+                SELECT DEPARTMENT
+            </span>
+
+            <h2>
+                Department Attendance Overview
+            </h2>
+
+        </div>
+
+
+        <form
+            method="GET"
+            action="{{ url_for('faculty_dashboard') }}"
+            class="department-form"
+            id="departmentForm"
+        >
+
+            <select
+                name="department"
+                class="department-select"
+                required
+            >
+
+                <option value="">
+                    Select Department
+                </option>
+
+                {% for department in departments %}
+
+                    <option
+                        value="{{ department }}"
+                        {% if selected_department == department %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ department }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="view-button"
+                id="viewDashboardButton"
+            >
+                View Dashboard
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+{% if selected_department %}
+
+
+<!-- ================================================= -->
+<!-- SELECTED DEPARTMENT -->
+<!-- ================================================= -->
+
+<div class="selected-department">
+
+    <span>
+        SELECTED DEPARTMENT
+    </span>
+
+    <strong>
+        {{ selected_department }}
+    </strong>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- SUMMARY CARDS -->
+<!-- ================================================= -->
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <span class="summary-label">
+            Total Students
+        </span>
+
+        <div class="summary-value">
+            {{ total_students }}
+        </div>
+
+        <span class="summary-description">
+            Students in department
+        </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <span class="summary-label">
+            Current Average
+        </span>
+
+        <div class="summary-value">
+
+            {% if current_average is not none %}
+                {{ current_average }}%
+            {% else %}
+                --
+            {% endif %}
+
+        </div>
+
+        <span class="summary-description">
+            Latest attendance
+        </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <span class="summary-label">
+            Predicted Average
+        </span>
+
+        <div class="summary-value prediction-value">
+
+            {% if predicted_average is not none %}
+                {{ predicted_average }}%
+            {% else %}
+                --
+            {% endif %}
+
+        </div>
+
+        <span class="summary-description">
+            Next month prediction
+        </span>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- HIGHEST ATTENDANCE - FIXED -->
+    <!-- ================================================= -->
+
+    <div class="summary-card">
+
+        <span class="summary-label">
+            Highest Attendance
+        </span>
+
+        <div class="summary-value">
+
+            {% set ns = namespace(highest=none) %}
+
+            {% for student in students %}
+
+                {% set attendance = student.get("Attendance") %}
+
+                {% if attendance is not none and attendance != "" %}
+
+                    {% if ns.highest is none or attendance|float > ns.highest|float %}
+
+                        {% set ns.highest = attendance %}
+
+                    {% endif %}
+
+                {% endif %}
+
+            {% endfor %}
+
+            {% if ns.highest is not none %}
+                {{ "%.2f"|format(ns.highest|float) }}%
+            {% elif highest_attendance is not none %}
+                {{ highest_attendance }}%
+            {% else %}
+                --
+            {% endif %}
+
+        </div>
+
+        <span class="summary-description">
+            Highest current attendance
+        </span>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- LOWEST ATTENDANCE -->
+    <!-- ================================================= -->
+
+    <div class="summary-card">
+
+        <span class="summary-label">
+            Lowest Attendance
+        </span>
+
+        <div class="summary-value">
+
+            {% if lowest_attendance is not none %}
+                {{ lowest_attendance }}%
+            {% else %}
+                --
+            {% endif %}
+
+        </div>
+
+        <span class="summary-description">
+            Lowest current attendance
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- ATTENDANCE STATUS -->
+<!-- ================================================= -->
+
+<div class="section-title">
+
+    <h2>
+        Attendance Status
+    </h2>
+
+    <p>
+        Student distribution based on predicted attendance.
+    </p>
+
+</div>
+
+
+<div class="status-grid">
+
+    <div class="status-card safe-card">
+
+        <span class="status-title">
+            Safe
+        </span>
+
+        <strong>
+            {{ safe_count }}
+        </strong>
+
+        <span>
+            Students
+        </span>
+
+    </div>
+
+
+    <div class="status-card risk-card">
+
+        <span class="status-title">
+            At Risk
+        </span>
+
+        <strong>
+            {{ at_risk_count }}
+        </strong>
+
+        <span>
+            Students
+        </span>
+
+    </div>
+
+
+    <div class="status-card danger-card">
+
+        <span class="status-title">
+            High Risk
+        </span>
+
+        <strong>
+            {{ high_risk_count }}
+        </strong>
+
+        <span>
+            Students
+        </span>
+
+    </div>
+
+
+    <div class="status-card">
+
+        <span class="status-title">
+            High Attendance
+        </span>
+
+        <strong>
+            {{ high_count }}
+        </strong>
+
+        <span>
+            Students
+        </span>
+
+    </div>
+
+
+    <div class="status-card">
+
+        <span class="status-title">
+            Medium Attendance
+        </span>
+
+        <strong>
+            {{ medium_count }}
+        </strong>
+
+        <span>
+            Students
+        </span>
+
+    </div>
+
+
+    <div class="status-card">
+
+        <span class="status-title">
+            Low Attendance
+        </span>
+
+        <strong>
+            {{ low_count }}
+        </strong>
+
+        <span>
+            Students
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- CHARTS -->
+<!-- ================================================= -->
+
+<div class="charts-grid">
+
+
+    <!-- ================================================= -->
+    <!-- CURRENT VS PREDICTED -->
+    <!-- ================================================= -->
+
+    <div class="chart-card">
+
+        <div class="chart-header">
+
+            <h2>
+                Current vs Predicted Attendance
+            </h2>
+
+            <p>
+                Average attendance comparison for
+                {{ selected_department }}.
+            </p>
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="attendanceComparisonChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ATTENDANCE LEVEL -->
+    <!-- ================================================= -->
+
+    <div class="chart-card">
+
+        <div class="chart-header">
+
+            <h2>
+                Attendance Level Distribution
+            </h2>
+
+            <p>
+                Distribution of students by predicted attendance level.
+            </p>
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="attendanceLevelChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- SCATTER PLOT -->
+    <!-- ================================================= -->
+
+    <div class="chart-card chart-full">
+
+        <div class="chart-header">
+
+            <h2>
+                Student Attendance Performance
+            </h2>
+
+            <p>
+                Current attendance compared with predicted attendance
+                for each student.
+            </p>
+
+        </div>
+
+        <div class="chart-container scatter-chart">
+
+            <canvas id="studentPerformanceChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- STATUS DISTRIBUTION -->
+    <!-- ================================================= -->
+
+    <div class="chart-card chart-full">
+
+        <div class="chart-header">
+
+            <h2>
+                Attendance Status Distribution
+            </h2>
+
+            <p>
+                Safe, At Risk and High Risk student distribution.
+            </p>
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="statusChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- STUDENT TABLE -->
+<!-- ================================================= -->
+
+<div class="table-card">
+
+    <div class="table-header">
+
+        <div>
+
+            <h2>
+                Student Attendance Details
+            </h2>
+
+            <p>
+                Current and predicted attendance for
+                {{ selected_department }}.
+            </p>
+
+        </div>
+
+        <div class="student-count">
+            {{ students|length }} Students
+        </div>
+
+    </div>
+
+
+    {% if students %}
+
+    <div class="table-scroll">
+
+        <table class="department-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Student ID
+                    </th>
+
+                    <th>
+                        Roll No
+                    </th>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Gender
+                    </th>
+
+                    <th>
+                        Year
+                    </th>
+
+                    <th>
+                        Current Attendance
+                    </th>
+
+                    <th>
+                        Predicted Attendance
+                    </th>
+
+                    <th>
+                        Predicted Month
+                    </th>
+
+                    <th>
+                        Attendance Level
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for student in students %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ student.get("Student_ID", "--") }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        {{ student.get("Roll_No", "--") }}
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            {{ student.get("Name", "--") }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        {{ student.get("Email", "--") }}
+                    </td>
+
+
+                    <td>
+                        {{ student.get("Gender", "--") }}
+                    </td>
+
+
+                    <td>
+                        {{ student.get("Year", "--") }}
+                    </td>
+
+
+                    <td>
+
+                        {% if student.get("Attendance") is not none %}
+
+                            <span class="attendance-number">
+                                {{ student.get("Attendance") }}%
+                            </span>
+
+                        {% else %}
+
+                            <span class="not-available">
+                                --
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if student.get("Predicted_Attendance") is not none %}
+
+                            <span class="prediction-number">
+                                {{ student.get("Predicted_Attendance") }}%
+                            </span>
+
+                        {% else %}
+
+                            <span class="not-available">
+                                --
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if student.get("Predicted_Month") %}
+
+                            {{ student.get("Predicted_Month") }}
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% set level = student.get("Attendance_Level") %}
+
+                        {% if level == "High" %}
+
+                            <span class="badge high">
+                                High
+                            </span>
+
+                        {% elif level == "Medium" %}
+
+                            <span class="badge medium">
+                                Medium
+                            </span>
+
+                        {% elif level == "Low" %}
+
+                            <span class="badge low">
+                                Low
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge">
+                                --
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% set student_status = student.get("Status") %}
+
+                        {% if student_status == "Safe" %}
+
+                            <span class="badge high">
+                                Safe
+                            </span>
+
+                        {% elif student_status == "At Risk" %}
+
+                            <span class="badge medium">
+                                At Risk
+                            </span>
+
+                        {% elif student_status == "High Risk" %}
+
+                            <span class="badge low">
+                                High Risk
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge">
+                                --
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>
+            No Students Found
+        </h3>
+
+        <p>
+            No students were found for
+            {{ selected_department }}.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+{% else %}
+
+
+<!-- ================================================= -->
+<!-- INITIAL STATE -->
+<!-- ================================================= -->
+
+<div class="empty-dashboard">
+
+    <div class="empty-icon">
+        Department
+    </div>
+
+    <h2>
+        Select a Department
+    </h2>
+
+    <p>
+        Choose a department above to view its complete
+        attendance and prediction dashboard.
+    </p>
+
+</div>
+
+
+{% endif %}
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- LOADING OVERLAY -->
+<!-- ================================================= -->
+
+<div id="dashboardLoading" class="dashboard-loading">
+
+    <div class="loading-box">
+
+        <div class="loading-spinner"></div>
+
+        <div class="loading-title">
+            Loading Dashboard
+        </div>
+
+        <div class="loading-text">
+            Please wait while the department data is being loaded...
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* ================================================= */
+/* MAIN PAGE */
+/* ================================================= */
+
+.faculty-dashboard-page {
+
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 10px 10px 50px;
+
+}
+
+
+/* ================================================= */
+/* HEADER */
+/* ================================================= */
+
+.dashboard-header {
+    margin-bottom: 25px;
+}
+
+.page-kicker {
+
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 7px;
+
+}
+
+.dashboard-header h1 {
+
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+
+}
+
+.dashboard-header p {
+
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 15px;
+
+}
+
+
+/* ================================================= */
+/* DEPARTMENT SELECTOR */
+/* ================================================= */
+
+.department-selector-card {
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+
+}
+
+.selector-content {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+
+}
+
+.selector-label {
+
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+
+}
+
+.selector-content h2 {
+
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+
+}
+
+.department-form {
+
+    display: flex;
+    gap: 10px;
+
+}
+
+.department-select {
+
+    min-width: 220px;
+    height: 45px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    outline: none;
+
+}
+
+.department-select:focus {
+
+    border-color: #64748b;
+
+}
+
+.view-button {
+
+    height: 45px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 10px;
+    background: #111827;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+
+}
+
+.view-button:hover {
+
+    background: #1e293b;
+
+}
+
+.view-button.loading {
+
+    opacity: 0.75;
+    cursor: wait;
+
+}
+
+
+/* ================================================= */
+/* SELECTED DEPARTMENT */
+/* ================================================= */
+
+.selected-department {
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+
+}
+
+.selected-department span {
+
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 1px;
+
+}
+
+.selected-department strong {
+
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    color: #0f172a;
+    font-size: 13px;
+
+}
+
+
+/* ================================================= */
+/* SUMMARY */
+/* ================================================= */
+
+.summary-grid {
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+
+}
+
+.summary-card {
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+
+}
+
+.summary-label {
+
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 10px;
+
+}
+
+.summary-value {
+
+    font-size: 27px;
+    font-weight: 900;
+    color: #0f172a;
+
+}
+
+.prediction-value {
+
+    font-weight: 900;
+
+}
+
+.summary-description {
+
+    display: block;
+    margin-top: 7px;
+    font-size: 12px;
+    color: #94a3b8;
+
+}
+
+
+/* ================================================= */
+/* SECTION TITLE */
+/* ================================================= */
+
+.section-title {
+
+    margin-bottom: 15px;
+
+}
+
+.section-title h2 {
+
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+
+}
+
+.section-title p {
+
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+
+}
+
+
+/* ================================================= */
+/* STATUS CARDS */
+/* ================================================= */
+
+.status-grid {
+
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+
+}
+
+.status-card {
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 18px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+
+}
+
+.status-title {
+
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 9px;
+
+}
+
+.status-card strong {
+
+    display: block;
+    font-size: 25px;
+    font-weight: 900;
+    color: #0f172a;
+
+}
+
+.status-card span:last-child {
+
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #94a3b8;
+
+}
+
+
+/* ================================================= */
+/* CHARTS */
+/* ================================================= */
+
+.charts-grid {
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+
+}
+
+.chart-card {
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+
+}
+
+.chart-full {
+
+    grid-column: 1 / -1;
+
+}
+
+.chart-header {
+
+    margin-bottom: 18px;
+
+}
+
+.chart-header h2 {
+
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+
+}
+
+.chart-header p {
+
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 13px;
+
+}
+
+.chart-container {
+
+    position: relative;
+    width: 100%;
+    height: 330px;
+
+}
+
+
+/* ================================================= */
+/* SCATTER PLOT */
+/* ================================================= */
+
+.scatter-chart {
+
+    height: 450px;
+
+}
+
+
+/* ================================================= */
+/* TABLE */
+/* ================================================= */
+
+.table-card {
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+
+}
+
+.table-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 24px;
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+.table-header h2 {
+
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+
+}
+
+.table-header p {
+
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+
+}
+
+.student-count {
+
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+
+}
+
+.table-scroll {
+
+    width: 100%;
+    overflow-x: auto;
+
+}
+
+.department-table {
+
+    width: 100%;
+    min-width: 1250px;
+    border-collapse: collapse;
+
+}
+
+.department-table th {
+
+    padding: 14px 15px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+.department-table td {
+
+    padding: 15px;
+    font-size: 13px;
+    color: #334155;
+    white-space: nowrap;
+    border-bottom: 1px solid #eef2f7;
+
+}
+
+.department-table tbody tr:hover {
+
+    background: #f8fafc;
+
+}
+
+.attendance-number {
+
+    font-weight: 800;
+
+}
+
+.prediction-number {
+
+    font-weight: 900;
+
+}
+
+
+/* ================================================= */
+/* BADGES */
+/* ================================================= */
+
+.badge {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+
+}
+
+.badge.high {
+
+    background: #dcfce7;
+    color: #166534;
+
+}
+
+.badge.medium {
+
+    background: #fef3c7;
+    color: #92400e;
+
+}
+
+.badge.low {
+
+    background: #fee2e2;
+    color: #991b1b;
+
+}
+
+.not-available {
+
+    color: #94a3b8;
+    font-weight: 600;
+
+}
+
+
+/* ================================================= */
+/* EMPTY STATES */
+/* ================================================= */
+
+.empty-dashboard {
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 75px 30px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
+
+}
+
+.empty-icon {
+
+    font-size: 15px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 15px;
+
+}
+
+.empty-dashboard h2 {
+
+    margin: 0 0 8px;
+    font-size: 23px;
+    font-weight: 800;
+
+}
+
+.empty-dashboard p {
+
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+
+}
+
+.empty-state {
+
+    padding: 60px 30px;
+    text-align: center;
+
+}
+
+.empty-state h3 {
+
+    margin: 0 0 8px;
+    font-size: 20px;
+
+}
+
+.empty-state p {
+
+    margin: 0;
+    color: #64748b;
+
+}
+
+
+/* ================================================= */
+/* LOADING OVERLAY */
+/* ================================================= */
+
+.dashboard-loading {
+
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.90);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    backdrop-filter: blur(4px);
+
+}
+
+.loading-box {
+
+    width: 350px;
+    max-width: 90%;
+    padding: 32px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.16);
+
+}
+
+.loading-spinner {
+
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 18px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #111827;
+    border-radius: 50%;
+    animation: dashboardSpin 0.8s linear infinite;
+
+}
+
+.loading-title {
+
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 7px;
+
+}
+
+.loading-text {
+
+    font-size: 13px;
+    line-height: 1.5;
+    color: #64748b;
+
+}
+
+@keyframes dashboardSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* ================================================= */
+/* RESPONSIVE */
+/* ================================================= */
+
+@media (max-width: 1200px) {
+
+    .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .status-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+@media (max-width: 900px) {
+
+    .selector-content {
+
+        flex-direction: column;
+        align-items: flex-start;
+
+    }
+
+    .department-form {
+        width: 100%;
+    }
+
+    .department-select {
+        flex: 1;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-full {
+        grid-column: auto;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .department-form {
+        flex-direction: column;
+    }
+
+    .department-select,
+    .view-button {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .summary-grid,
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header h1 {
+        font-size: 27px;
+    }
+
+}
+
+
+/* ================================================= */
+/* CHART.JS CANVAS */
+/* ================================================= */
+
+#attendanceComparisonChart,
+#attendanceLevelChart,
+#studentPerformanceChart,
+#statusChart {
+
+    width: 100% !important;
+    height: 100% !important;
+
+}
+
+</style>
+
+
+<!-- ================================================= -->
+<!-- CHART.JS -->
+<!-- ================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<!-- ================================================= -->
+<!-- STUDENT DATA -->
+<!-- ================================================= -->
+
+<script id="students-data" type="application/json">
+{{ students | default([]) | tojson }}
+</script>
+
+
+<script>
+
+/* ================================================= */
+/* LOADING HANDLING */
+/* ================================================= */
+
+(function () {
+
+    const loading =
+        document.getElementById(
+            "dashboardLoading"
+        );
+
+    const form =
+        document.getElementById(
+            "departmentForm"
+        );
+
+    const button =
+        document.getElementById(
+            "viewDashboardButton"
+        );
+
+
+    if (form) {
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+                if (loading) {
+                    loading.style.display = "flex";
+                }
+
+                if (button) {
+
+                    button.classList.add(
+                        "loading"
+                    );
+
+                    button.disabled = true;
+
+                    button.textContent =
+                        "Loading...";
+
+                }
+
+            }
+        );
+
+    }
+
+})();
+
+
+/* ================================================= */
+/* READ STUDENT DATA */
+/* ================================================= */
+
+let studentsData = [];
+
+const studentsDataElement =
+    document.getElementById(
+        "students-data"
+    );
+
+
+if (studentsDataElement) {
+
+    try {
+
+        const rawData =
+            studentsDataElement.textContent.trim();
+
+        if (rawData) {
+
+            studentsData =
+                JSON.parse(rawData);
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Student data could not be loaded:",
+            error
+        );
+
+        studentsData = [];
+
+    }
+
+}
+
+
+/* ================================================= */
+/* CURRENT ATTENDANCE */
+/* ================================================= */
+
+const currentValues =
+    studentsData
+
+        .map(function (student) {
+
+            return Number(
+                student.Attendance
+            );
+
+        })
+
+        .filter(function (value) {
+
+            return Number.isFinite(value);
+
+        });
+
+
+/* ================================================= */
+/* PREDICTED ATTENDANCE */
+/* ================================================= */
+
+const predictedValues =
+    studentsData
+
+        .map(function (student) {
+
+            return Number(
+                student.Predicted_Attendance
+            );
+
+        })
+
+        .filter(function (value) {
+
+            return Number.isFinite(value);
+
+        });
+
+
+/* ================================================= */
+/* AVERAGES */
+/* ================================================= */
+
+const currentAverage =
+    currentValues.length > 0
+
+        ? currentValues.reduce(
+            function (sum, value) {
+                return sum + value;
+            },
+            0
+        ) / currentValues.length
+
+        : 0;
+
+
+const predictedAverage =
+    predictedValues.length > 0
+
+        ? predictedValues.reduce(
+            function (sum, value) {
+                return sum + value;
+            },
+            0
+        ) / predictedValues.length
+
+        : 0;
+
+
+/* ================================================= */
+/* ATTENDANCE LEVEL COUNTS */
+/* ================================================= */
+
+const highCount =
+    studentsData.filter(
+        function (student) {
+
+            return student.Attendance_Level === "High";
+
+        }
+    ).length;
+
+
+const mediumCount =
+    studentsData.filter(
+        function (student) {
+
+            return student.Attendance_Level === "Medium";
+
+        }
+    ).length;
+
+
+const lowCount =
+    studentsData.filter(
+        function (student) {
+
+            return student.Attendance_Level === "Low";
+
+        }
+    ).length;
+
+
+/* ================================================= */
+/* STATUS COUNTS */
+/* ================================================= */
+
+const safeCount =
+    studentsData.filter(
+        function (student) {
+
+            return student.Status === "Safe";
+
+        }
+    ).length;
+
+
+const atRiskCount =
+    studentsData.filter(
+        function (student) {
+
+            return student.Status === "At Risk";
+
+        }
+    ).length;
+
+
+const highRiskCount =
+    studentsData.filter(
+        function (student) {
+
+            return student.Status === "High Risk";
+
+        }
+    ).length;
+
+
+/* ================================================= */
+/* COMMON OPTIONS */
+/* ================================================= */
+
+const commonOptions = {
+
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+
+        legend: {
+
+            labels: {
+
+                font: {
+                    family: "Arial, sans-serif",
+                    size: 12
+                },
+
+                usePointStyle: true
+
+            }
+
+        }
+
+    }
+
+};
+
+
+/* ================================================= */
+/* CURRENT VS PREDICTED */
+/* ================================================= */
+
+const comparisonCanvas =
+    document.getElementById(
+        "attendanceComparisonChart"
+    );
+
+
+if (
+    comparisonCanvas &&
+    typeof Chart !== "undefined"
+) {
+
+    new Chart(
+
+        comparisonCanvas.getContext("2d"),
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+                    "Current Attendance",
+                    "Predicted Attendance"
+                ],
+
+                datasets: [
+
+                    {
+
+                        label: "Attendance %",
+
+                        data: [
+
+                            Number(
+                                currentAverage.toFixed(2)
+                            ),
+
+                            Number(
+                                predictedAverage.toFixed(2)
+                            )
+
+                        ],
+
+                        borderWidth: 1,
+
+                        borderRadius: 8,
+
+                        maxBarThickness: 80
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...commonOptions,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label:
+                                function (context) {
+
+                                    return (
+                                        context.raw +
+                                        "%"
+                                    );
+
+                                }
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100,
+
+                        ticks: {
+
+                            callback:
+                                function (value) {
+
+                                    return (
+                                        value +
+                                        "%"
+                                    );
+
+                                }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* ================================================= */
+/* ATTENDANCE LEVEL DOUGHNUT */
+/* ================================================= */
+
+const levelCanvas =
+    document.getElementById(
+        "attendanceLevelChart"
+    );
+
+
+if (
+    levelCanvas &&
+    typeof Chart !== "undefined"
+) {
+
+    new Chart(
+
+        levelCanvas.getContext("2d"),
+
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "High",
+                    "Medium",
+                    "Low"
+                ],
+
+                datasets: [
+
+                    {
+
+                        data: [
+
+                            highCount,
+                            mediumCount,
+                            lowCount
+
+                        ],
+
+                        borderWidth: 2,
+
+                        hoverOffset: 8
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...commonOptions,
+
+                cutout: "62%",
+
+                plugins: {
+
+                    legend: {
+
+                        display: true,
+
+                        position: "bottom"
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* ================================================= */
+/* PROFESSIONAL SCATTER PLOT */
+/* ================================================= */
+
+const performanceCanvas =
+    document.getElementById(
+        "studentPerformanceChart"
+    );
+
+
+if (
+    performanceCanvas &&
+    typeof Chart !== "undefined" &&
+    studentsData.length > 0
+) {
+
+
+    /* --------------------------------------------- */
+    /* CREATE SCATTER POINTS */
+    /* --------------------------------------------- */
+
+    const scatterPoints =
+        studentsData
+
+            .map(function (student, index) {
+
+                const current =
+                    Number(
+                        student.Attendance
+                    );
+
+                const predicted =
+                    Number(
+                        student.Predicted_Attendance
+                    );
+
+
+                if (
+                    !Number.isFinite(current) ||
+                    !Number.isFinite(predicted)
+                ) {
+
+                    return null;
+
+                }
+
+
+                return {
+
+                    x: current,
+
+                    y: predicted,
+
+                    studentName:
+                        student.Name
+                            ? String(student.Name)
+                            : "Student " + (index + 1),
+
+                    rollNo:
+                        student.Roll_No
+                            ? String(student.Roll_No)
+                            : "--"
+
+                };
+
+            })
+
+            .filter(function (point) {
+
+                return point !== null;
+
+            });
+
+
+    /* --------------------------------------------- */
+    /* REFERENCE LINE */
+    /* Current = Predicted */
+    /* --------------------------------------------- */
+
+    const referenceLine = [
+
+        {
+            x: 0,
+            y: 0
+        },
+
+        {
+            x: 100,
+            y: 100
+        }
+
+    ];
+
+
+    /* --------------------------------------------- */
+    /* SCATTER CHART */
+    /* --------------------------------------------- */
+
+    new Chart(
+
+        performanceCanvas.getContext("2d"),
+
+        {
+
+            type: "scatter",
+
+            data: {
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Student Performance",
+
+                        data:
+                            scatterPoints,
+
+                        pointRadius: 6,
+
+                        pointHoverRadius: 9,
+
+                        borderWidth: 2
+
+                    },
+
+                    {
+
+                        label:
+                            "Current = Predicted",
+
+                        data:
+                            referenceLine,
+
+                        type: "line",
+
+                        borderWidth: 1.5,
+
+                        borderDash: [
+                            6,
+                            6
+                        ],
+
+                        pointRadius: 0,
+
+                        fill: false,
+
+                        tension: 0
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+
+                interaction: {
+
+                    mode: "nearest",
+
+                    intersect: true
+
+                },
+
+
+                plugins: {
+
+                    legend: {
+
+                        display: true,
+
+                        position: "top",
+
+                        labels: {
+
+                            usePointStyle: true,
+
+                            padding: 18,
+
+                            font: {
+
+                                family:
+                                    "Arial, sans-serif",
+
+                                size: 12,
+
+                                weight: "600"
+
+                            }
+
+                        }
+
+                    },
+
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            title:
+                                function () {
+
+                                    return "";
+
+                                },
+
+
+                            label:
+                                function (context) {
+
+                                    const point =
+                                        context.raw;
+
+
+                                    if (
+                                        context.datasetIndex === 1
+                                    ) {
+
+                                        return (
+                                            "Current = Predicted"
+                                        );
+
+                                    }
+
+
+                                    return [
+
+                                        "Student: " +
+                                            point.studentName,
+
+                                        "Roll No: " +
+                                            point.rollNo,
+
+                                        "Current: " +
+                                            point.x.toFixed(2) +
+                                            "%",
+
+                                        "Predicted: " +
+                                            point.y.toFixed(2) +
+                                            "%"
+
+                                    ];
+
+                                }
+
+                        }
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    x: {
+
+                        min: 0,
+
+                        max: 100,
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Current Attendance (%)",
+
+                            font: {
+
+                                weight: "700",
+
+                                size: 13
+
+                            }
+
+                        },
+
+                        ticks: {
+
+                            callback:
+                                function (value) {
+
+                                    return (
+                                        value +
+                                        "%"
+                                    );
+
+                                }
+
+                        },
+
+                        grid: {
+
+                            color:
+                                "rgba(148,163,184,0.15)"
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        min: 0,
+
+                        max: 100,
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Predicted Attendance (%)",
+
+                            font: {
+
+                                weight: "700",
+
+                                size: 13
+
+                            }
+
+                        },
+
+                        ticks: {
+
+                            callback:
+                                function (value) {
+
+                                    return (
+                                        value +
+                                        "%"
+                                    );
+
+                                }
+
+                        },
+
+                        grid: {
+
+                            color:
+                                "rgba(148,163,184,0.15)"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* ================================================= */
+/* STATUS CHART */
+/* ================================================= */
+
+const statusCanvas =
+    document.getElementById(
+        "statusChart"
+    );
+
+
+if (
+    statusCanvas &&
+    typeof Chart !== "undefined"
+) {
+
+    new Chart(
+
+        statusCanvas.getContext("2d"),
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+                    "Safe",
+                    "At Risk",
+                    "High Risk"
+                ],
+
+                datasets: [
+
+                    {
+
+                        label: "Students",
+
+                        data: [
+
+                            safeCount,
+                            atRiskCount,
+                            highRiskCount
+
+                        ],
+
+                        borderWidth: 1,
+
+                        borderRadius: 8,
+
+                        maxBarThickness: 80
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...commonOptions,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+</script>
+
+{% endblock %}

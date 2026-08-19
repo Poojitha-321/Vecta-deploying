@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="landing-page">
+
+
+    <header class="landing-nav">
+
+        <div class="landing-logo">
+            Attendance AI
+        </div>
+
+
+        <div class="landing-nav-links">
+
+            <a
+                href="{{ url_for('login') }}"
+                class="nav-button login">
+
+                Login
+
+            </a>
+
+
+            <a
+                href="{{ url_for('create_account') }}"
+                class="nav-button register">
+
+                Create Account
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+
+                Smart Student
+                <span>Attendance Prediction</span>
+
+            </h1>
+
+
+            <p>
+
+                An AI-powered attendance forecasting
+                system that uses historical student
+                attendance data to predict upcoming
+                monthly attendance.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="hero-button primary">
+
+                    Student Login
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('create_account') }}"
+                    class="hero-button secondary">
+
+                    Create Account
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</div>
+
+
+</body>
+
+</html>
