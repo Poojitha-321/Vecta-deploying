@@ -1,0 +1,632 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='faculty.css') }}">
+
+<div class="new-student-result-page">
+
+    <div class="page-header">
+
+        <div>
+            <span class="page-kicker">
+                FACULTY PORTAL
+            </span>
+
+            <h1>
+                Student Prediction Result
+            </h1>
+
+            <p>
+                Attendance prediction generated successfully.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="student-info-card">
+
+        <div class="info-item">
+            <span class="info-label">Student ID</span>
+            <strong>{{ student.get("Student_ID", "--") }}</strong>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Roll No</span>
+            <strong>{{ student.get("Roll_No", "--") }}</strong>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Student Name</span>
+            <strong>{{ student.get("Name", "--") }}</strong>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Department</span>
+            <strong>{{ student.get("Department", "--") }}</strong>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Year</span>
+            <strong>{{ student.get("Year", "--") }}</strong>
+        </div>
+
+    </div>
+
+
+    <div class="prediction-grid">
+
+        <div class="prediction-card">
+
+            <span class="card-label">
+                Current Attendance
+            </span>
+
+            <div class="card-value">
+                {{ current_attendance }}%
+            </div>
+
+            <span class="card-description">
+                Latest available attendance
+            </span>
+
+        </div>
+
+
+        <div class="prediction-card prediction-main">
+
+            <span class="card-label">
+                Predicted Attendance
+            </span>
+
+            <div class="card-value">
+                {{ predicted_value }}%
+            </div>
+
+            <span class="card-description">
+                Prediction for {{ predicted_month }}
+            </span>
+
+        </div>
+
+
+        <div class="prediction-card">
+
+            <span class="card-label">
+                Predicted Month
+            </span>
+
+            <div class="month-value">
+                {{ predicted_month }}
+            </div>
+
+            <span class="card-description">
+                Future attendance
+            </span>
+
+        </div>
+
+
+        <div class="prediction-card">
+
+            <span class="card-label">
+                Attendance Level
+            </span>
+
+            <div class="level-value">
+
+                {% if attendance_level == "High" %}
+
+                    <span class="status-badge high">
+                        High
+                    </span>
+
+                {% elif attendance_level == "Medium" %}
+
+                    <span class="status-badge medium">
+                        Medium
+                    </span>
+
+                {% elif attendance_level == "Low" %}
+
+                    <span class="status-badge low">
+                        Low
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge">
+                        --
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <span class="card-description">
+                Predicted attendance level
+            </span>
+
+        </div>
+
+
+        <div class="prediction-card">
+
+            <span class="card-label">
+                Status
+            </span>
+
+            <div class="level-value">
+
+                {% if status == "Safe" %}
+
+                    <span class="status-badge high">
+                        Safe
+                    </span>
+
+                {% elif status == "At Risk" %}
+
+                    <span class="status-badge medium">
+                        At Risk
+                    </span>
+
+                {% elif status == "High Risk" %}
+
+                    <span class="status-badge low">
+                        High Risk
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge">
+                        --
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <span class="card-description">
+                Attendance status
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="chart-card">
+
+        <div class="chart-header">
+
+            <div>
+
+                <h2>
+                    Attendance Trend & Prediction
+                </h2>
+
+                <p>
+                    Historical attendance and predicted future attendance.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas id="attendanceChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="result-actions">
+
+        <a
+            href="{{ url_for('add_student') }}"
+            class="secondary-button"
+        >
+            Add Another Student
+        </a>
+
+
+        <a
+            href="{{ url_for('faculty_home') }}"
+            class="primary-button"
+        >
+            Back to Faculty Home
+        </a>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.new-student-result-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 10px 50px;
+}
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-kicker {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 7px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.page-header p {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+
+/* STUDENT INFORMATION */
+
+.student-info-card {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.info-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 18px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);
+}
+
+.info-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.info-item strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    word-break: break-word;
+}
+
+
+/* PREDICTION CARDS */
+
+.prediction-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.prediction-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+}
+
+.card-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.card-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.month-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: #0f172a;
+    margin-top: 5px;
+}
+
+.card-description {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.level-value {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.status-badge.high {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.low {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* CHART */
+
+.chart-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+    margin-bottom: 24px;
+}
+
+.chart-header {
+    margin-bottom: 20px;
+}
+
+.chart-header h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.chart-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 380px;
+}
+
+#attendanceChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* ACTIONS */
+
+.result-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.primary-button,
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.primary-button {
+    background: #111827;
+    color: #ffffff;
+}
+
+.primary-button:hover {
+    background: #1e293b;
+}
+
+.secondary-button {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.secondary-button:hover {
+    background: #e2e8f0;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+
+    .student-info-card {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .prediction-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+@media (max-width: 750px) {
+
+    .student-info-card {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .prediction-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .student-info-card,
+    .prediction-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-actions {
+        flex-direction: column;
+    }
+
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+
+<script id="chart-labels-data" type="application/json">
+{{ chart_labels | default([]) | tojson }}
+</script>
+
+<script id="chart-values-data" type="application/json">
+{{ chart_values | default([]) | tojson }}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const chartLabels = JSON.parse(
+    document.getElementById("chart-labels-data").textContent
+);
+
+const chartValues = JSON.parse(
+    document.getElementById("chart-values-data").textContent
+);
+
+
+const canvas = document.getElementById("attendanceChart");
+
+
+if (canvas) {
+
+    const context = canvas.getContext("2d");
+
+
+    new Chart(context, {
+
+        type: "line",
+
+        data: {
+
+            labels: chartLabels,
+
+            datasets: [
+
+                {
+
+                    label: "Attendance",
+
+                    data: chartValues,
+
+                    borderWidth: 3,
+
+                    tension: 0.3,
+
+                    fill: false,
+
+                    pointRadius: 5,
+
+                    pointHoverRadius: 7
+
+                }
+
+            ]
+
+        },
+
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    max: 100,
+
+                    ticks: {
+
+                        callback: function(value) {
+
+                            return value + "%";
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+
+            plugins: {
+
+                legend: {
+
+                    display: true
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

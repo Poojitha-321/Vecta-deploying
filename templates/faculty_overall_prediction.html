@@ -1,0 +1,498 @@
+{% extends "faculty_base.html" %}
+
+{% block title %}
+Overall Prediction | Faculty Portal
+{% endblock %}
+
+{% block content %}
+
+<div class="prediction-page">
+
+    <!-- ================================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ================================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="section-label">
+                FACULTY ANALYTICS
+            </span>
+
+            <h1>
+                Overall Attendance Prediction
+            </h1>
+
+            <p>
+                Filter students and predict their average future attendance.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- FILTER CARD -->
+    <!-- ================================================= -->
+
+    <div class="prediction-filter-card">
+
+        <form
+            method="POST"
+            action="{{ url_for('faculty_overall_prediction') }}"
+            id="predictionForm"
+        >
+
+            <div class="prediction-filter-grid">
+
+
+                <!-- DEPARTMENT -->
+
+                <div class="form-field">
+
+                    <label>
+                        Department
+                    </label>
+
+                    <select name="department">
+
+                        <option value="">
+                            All Departments
+                        </option>
+
+                        {% for department in departments %}
+
+                        <option value="{{ department }}">
+                            {{ department }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- YEAR -->
+
+                <div class="form-field">
+
+                    <label>
+                        Year
+                    </label>
+
+                    <select name="year">
+
+                        <option value="">
+                            All Years
+                        </option>
+
+                        {% for year in years %}
+
+                        <option value="{{ year }}">
+                            {{ year }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- GENDER -->
+
+                <div class="form-field">
+
+                    <label>
+                        Gender
+                    </label>
+
+                    <select name="gender">
+
+                        <option value="">
+                            All Genders
+                        </option>
+
+                        {% for gender in genders %}
+
+                        <option value="{{ gender }}">
+                            {{ gender }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- PREDICTION MONTH -->
+
+                <div class="form-field">
+
+                    <label>
+                        Prediction Month
+                    </label>
+
+                    <select
+                        name="target_month"
+                        required
+                    >
+
+                        <option value="">
+                            Select Month
+                        </option>
+
+                        {% for month in months %}
+
+                        <option value="{{ month }}">
+                            {{ month }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                class="primary-button prediction-button"
+                id="predictionButton"
+            >
+
+                <span id="predictionButtonText">
+                    Generate Prediction
+                </span>
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- RESULTS -->
+    <!-- ================================================= -->
+
+    {% if result %}
+
+    <div class="stats-grid">
+
+
+        <!-- STUDENTS -->
+
+        <div class="stat-card">
+
+            <span>
+                Students
+            </span>
+
+            <strong>
+                {{ result.count }}
+            </strong>
+
+        </div>
+
+
+        <!-- AVERAGE -->
+
+        <div class="stat-card">
+
+            <span>
+                Average Predicted Attendance
+            </span>
+
+            <strong>
+                {{ result.average }}%
+            </strong>
+
+        </div>
+
+
+        <!-- HIGHEST -->
+
+        <div class="stat-card">
+
+            <span>
+                Highest Prediction
+            </span>
+
+            <strong>
+                {{ result.highest }}%
+            </strong>
+
+        </div>
+
+
+        <!-- LOWEST -->
+
+        <div class="stat-card">
+
+            <span>
+                Lowest Prediction
+            </span>
+
+            <strong>
+                {{ result.lowest }}%
+            </strong>
+
+        </div>
+
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- LOADING OVERLAY -->
+<!-- ===================================================== -->
+
+<div
+    id="predictionLoading"
+    class="prediction-loading"
+>
+
+    <div class="prediction-loading-box">
+
+        <div class="prediction-spinner"></div>
+
+        <div class="prediction-loading-title">
+            Generating Prediction
+        </div>
+
+        <div class="prediction-loading-text">
+            Please wait while the attendance predictions
+            are being calculated...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- LOADING STYLE -->
+<!-- ===================================================== -->
+
+<style>
+
+.prediction-loading {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(255, 255, 255, 0.92);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 99999;
+
+    backdrop-filter: blur(4px);
+
+}
+
+
+.prediction-loading-box {
+
+    width: 360px;
+
+    max-width: 90%;
+
+    padding: 34px 30px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(15, 23, 42, 0.16);
+
+}
+
+
+.prediction-spinner {
+
+    width: 48px;
+
+    height: 48px;
+
+    margin: 0 auto 18px;
+
+    border: 4px solid #e2e8f0;
+
+    border-top-color: #111827;
+
+    border-radius: 50%;
+
+    animation:
+        predictionSpin
+        0.8s linear infinite;
+
+}
+
+
+.prediction-loading-title {
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+    color: #0f172a;
+
+    margin-bottom: 7px;
+
+}
+
+
+.prediction-loading-text {
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    color: #64748b;
+
+}
+
+
+@keyframes predictionSpin {
+
+    from {
+
+        transform: rotate(0deg);
+
+    }
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+
+}
+
+
+/* BUTTON WHILE LOADING */
+
+.prediction-button.loading {
+
+    opacity: 0.75;
+
+    cursor: wait;
+
+}
+
+
+</style>
+
+
+<!-- ===================================================== -->
+<!-- LOADING SCRIPT -->
+<!-- ===================================================== -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "predictionForm"
+            );
+
+        const loading =
+            document.getElementById(
+                "predictionLoading"
+            );
+
+        const button =
+            document.getElementById(
+                "predictionButton"
+            );
+
+        const buttonText =
+            document.getElementById(
+                "predictionButtonText"
+            );
+
+
+        if (!form) {
+            return;
+        }
+
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                /*
+                 * Show loading screen immediately
+                 */
+
+                if (loading) {
+
+                    loading.style.display =
+                        "flex";
+
+                }
+
+
+                /*
+                 * Disable button
+                 */
+
+                if (button) {
+
+                    button.classList.add(
+                        "loading"
+                    );
+
+                    button.disabled = true;
+
+                }
+
+
+                /*
+                 * Change button text
+                 */
+
+                if (buttonText) {
+
+                    buttonText.textContent =
+                        "Generating...";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

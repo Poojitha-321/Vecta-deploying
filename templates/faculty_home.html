@@ -1,0 +1,198 @@
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='faculty.css') }}">
+{% extends "faculty_base.html" %}
+
+{% block title %}
+Faculty Portal | Attendance AI
+{% endblock %}
+
+
+{% block content %}
+
+<section class="faculty-home">
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="faculty-home-header">
+
+        <span class="section-label">
+            FACULTY PORTAL
+        </span>
+
+        <h1>
+            Welcome to Attendance AI
+        </h1>
+
+        <p>
+            Attendance monitoring and prediction system
+        </p>
+
+    </div>
+
+
+    <!-- HERO -->
+
+    <section class="faculty-hero">
+
+        <div class="faculty-hero-content">
+
+            <span class="hero-label">
+                AI POWERED ATTENDANCE
+            </span>
+
+            <h1>
+                Attendance Intelligence Dashboard
+            </h1>
+
+            <p>
+                Monitor student attendance, analyze departments,
+                upload student data and generate future attendance
+                predictions using AI.
+            </p>
+
+
+            <div class="hero-actions">
+
+                <a
+                    href="{{ url_for('faculty_attendance') }}"
+                    class="faculty-button hero-primary"
+                >
+                    View Attendance
+                </a>
+
+
+                <a
+                    href="{{ url_for('upload_data') }}"
+                    class="faculty-button hero-secondary"
+                >
+                    Upload Data
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="faculty-hero-visual">
+
+            <div class="hero-visual-circle">
+
+                <span>
+                    👩‍🏫
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FEATURE CARDS -->
+
+    <section class="faculty-cards">
+
+
+        <!-- ATTENDANCE -->
+
+        <div class="faculty-card">
+
+            <div class="faculty-card-icon attendance-icon">
+                📋
+            </div>
+
+            <div class="faculty-card-content">
+
+                <h3>
+                    Attendance
+                </h3>
+
+                <p>
+                    View student attendance by department
+                    and analyze current attendance.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('faculty_attendance') }}"
+                class="faculty-button primary"
+            >
+                View Attendance
+            </a>
+
+        </div>
+
+
+        <!-- DASHBOARD -->
+
+        <div class="faculty-card">
+
+            <div class="faculty-card-icon dashboard-icon">
+                📊
+            </div>
+
+            <div class="faculty-card-content">
+
+                <h3>
+                    Dashboard
+                </h3>
+
+                <p>
+                    View graphical attendance trends
+                    and prediction results.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('faculty_dashboard') }}"
+                class="faculty-button primary"
+            >
+                Open Dashboard
+            </a>
+
+        </div>
+
+
+        <!-- UPLOAD -->
+
+        <div class="faculty-card">
+
+            <div class="faculty-card-icon upload-icon">
+                📁
+            </div>
+
+            <div class="faculty-card-content">
+
+                <h3>
+                    Upload Data
+                </h3>
+
+                <p>
+                    Upload student attendance data
+                    and generate predictions.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('upload_data') }}"
+                class="faculty-button primary"
+            >
+                Upload Data
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+</section>
+
+{% endblock %}

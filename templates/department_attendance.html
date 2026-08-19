@@ -1,0 +1,1157 @@
+{% extends "faculty_base.html" %}
+
+{% block title %}
+{{ department }} Attendance | Faculty Portal
+{% endblock %}
+
+{% block content %}
+
+<div class="department-attendance-page">
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="page-kicker">
+                FACULTY PORTAL
+            </span>
+
+            <h1>
+                {{ department }} Attendance
+            </h1>
+
+            <p>
+                View student attendance and prediction details.
+            </p>
+
+        </div>
+
+        <div class="header-badge">
+            {{ students|length }} Students
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- INFORMATION CARDS -->
+    <!-- ================================================= -->
+
+    <div class="attendance-info-card">
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Department
+            </span>
+
+            <strong>
+                {{ department }}
+            </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Current Attendance
+            </span>
+
+            <strong>
+                {{ current_month|default("November") }}
+            </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Students
+            </span>
+
+            <strong>
+                {{ students|length }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ERROR -->
+    <!-- ================================================= -->
+
+    {% if error %}
+
+    <div class="attendance-alert">
+
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================================= -->
+    <!-- STUDENT TABLE -->
+    <!-- ================================================= -->
+
+    {% if students %}
+
+    <div class="attendance-table-card">
+
+        <div class="table-heading">
+
+            <div>
+
+                <span class="table-kicker">
+                    ATTENDANCE RECORDS
+                </span>
+
+                <h2>
+                    Student Attendance
+                </h2>
+
+                <p>
+                    Current attendance and future prediction
+                    for {{ department }} students.
+                </p>
+
+            </div>
+
+            <div class="table-count">
+                {{ students|length }} Students
+            </div>
+
+        </div>
+
+
+        <div class="table-scroll">
+
+            <table class="department-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Student ID
+                        </th>
+
+                        <th>
+                            Roll No
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Gender
+                        </th>
+
+                        <th>
+                            Year
+                        </th>
+
+                        <th>
+                            Current Attendance
+                        </th>
+
+                        <th>
+                            Predicted Attendance
+                        </th>
+
+                        <th>
+                            Predicted Month
+                        </th>
+
+                        <th>
+                            Attendance Level
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for student in students %}
+
+                    <tr>
+
+                        <!-- STUDENT ID -->
+
+                        <td>
+
+                            <strong>
+                                {{ student.get("Student_ID", "--") }}
+                            </strong>
+
+                        </td>
+
+
+                        <!-- ROLL NUMBER -->
+
+                        <td>
+
+                            {{ student.get("Roll_No", "--") }}
+
+                        </td>
+
+
+                        <!-- NAME -->
+
+                        <td>
+
+                            <strong>
+                                {{ student.get("Name", "--") }}
+                            </strong>
+
+                        </td>
+
+
+                        <!-- EMAIL -->
+
+                        <td>
+
+                            {{ student.get("Email", "--") }}
+
+                        </td>
+
+
+                        <!-- GENDER -->
+
+                        <td>
+
+                            {{ student.get("Gender", "--") }}
+
+                        </td>
+
+
+                        <!-- YEAR -->
+
+                        <td>
+
+                            {{ student.get("Year", "--") }}
+
+                        </td>
+
+
+                        <!-- CURRENT ATTENDANCE -->
+
+                        <td>
+
+                            {% set current =
+                                student.get("Attendance") %}
+
+                            {% if current is not none
+                                  and current != ""
+                                  and current == current %}
+
+                                <span class="attendance-number">
+
+                                    {{ current }}%
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="not-available">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PREDICTED ATTENDANCE -->
+
+                        <td>
+
+                            {% set predicted =
+                                student.get("Predicted_Attendance") %}
+
+                            {% if predicted is not none
+                                  and predicted != ""
+                                  and predicted == predicted %}
+
+                                <span class="prediction-number">
+
+                                    {{ predicted }}%
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="not-available">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PREDICTED MONTH -->
+
+                        <td>
+
+                            {% set predicted_month =
+                                student.get("Predicted_Month") %}
+
+                            {% if predicted_month %}
+
+                                <span class="month-value">
+                                    {{ predicted_month }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="not-available">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ATTENDANCE LEVEL -->
+
+                        <td>
+
+                            {% set level =
+                                student.get("Attendance_Level") %}
+
+
+                            {% if level == "High" %}
+
+                                <span class="attendance-status level-high">
+                                    High
+                                </span>
+
+
+                            {% elif level == "Medium" %}
+
+                                <span class="attendance-status level-medium">
+                                    Medium
+                                </span>
+
+
+                            {% elif level == "Low" %}
+
+                                <span class="attendance-status level-low">
+                                    Low
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="attendance-status">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% set status =
+                                student.get("Status") %}
+
+
+                            {% if status == "Safe" %}
+
+                                <span class="attendance-status status-safe">
+                                    Safe
+                                </span>
+
+
+                            {% elif status == "At Risk" %}
+
+                                <span class="attendance-status status-risk">
+                                    At Risk
+                                </span>
+
+
+                            {% elif status == "High Risk" %}
+
+                                <span class="attendance-status status-danger">
+                                    High Risk
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="attendance-status">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    {% else %}
+
+    <!-- ================================================= -->
+    <!-- EMPTY STATE -->
+    <!-- ================================================= -->
+
+    <div class="empty-attendance">
+
+        <div class="empty-icon">
+            Attendance
+        </div>
+
+        <h2>
+            No Students Found
+        </h2>
+
+        <p>
+            No attendance records were found for
+            {{ department }}.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================================= -->
+    <!-- BACK BUTTON -->
+    <!-- ================================================= -->
+
+    <div class="department-actions">
+
+        <a
+            href="{{ url_for('faculty_attendance') }}"
+            class="back-button"
+        >
+            ← Back to Attendance
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- PAGE CSS -->
+<!-- ===================================================== -->
+
+<style>
+
+/* ================================================= */
+/* PAGE */
+/* ================================================= */
+
+.department-attendance-page {
+
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 10px 10px 45px;
+
+}
+
+
+/* ================================================= */
+/* HEADER */
+/* ================================================= */
+
+.department-attendance-page .page-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 25px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.department-attendance-page .page-kicker {
+
+    display: inline-block;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    margin-bottom: 7px;
+
+}
+
+
+.department-attendance-page .page-header h1 {
+
+    margin: 0;
+
+    font-size: 32px;
+    font-weight: 800;
+
+    color: #0f172a;
+
+}
+
+
+.department-attendance-page .page-header p {
+
+    margin: 8px 0 0;
+
+    font-size: 15px;
+
+    color: #64748b;
+
+}
+
+
+.header-badge {
+
+    padding: 11px 18px;
+
+    border-radius: 10px;
+
+    background: #f1f5f9;
+
+    color: #334155;
+
+    border: 1px solid #e2e8f0;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+/* ================================================= */
+/* INFORMATION */
+/* ================================================= */
+
+.attendance-info-card {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.info-item {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 15px;
+
+    padding: 21px;
+
+    box-shadow:
+        0 5px 18px
+        rgba(15, 23, 42, 0.06);
+
+}
+
+
+.info-label {
+
+    display: block;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    color: #64748b;
+
+    letter-spacing: .7px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 9px;
+
+}
+
+
+.info-item strong {
+
+    display: block;
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    color: #0f172a;
+
+}
+
+
+/* ================================================= */
+/* ERROR */
+/* ================================================= */
+
+.attendance-alert {
+
+    margin-bottom: 20px;
+
+    padding: 14px 18px;
+
+    border-radius: 10px;
+
+    background: #fff7ed;
+
+    border: 1px solid #fed7aa;
+
+    color: #9a3412;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+/* ================================================= */
+/* TABLE CARD */
+/* ================================================= */
+
+.attendance-table-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 8px 25px
+        rgba(15, 23, 42, 0.07);
+
+}
+
+
+/* ================================================= */
+/* TABLE HEADER */
+/* ================================================= */
+
+.table-heading {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 23px 25px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+
+.table-kicker {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    color: #64748b;
+
+}
+
+
+.table-heading h2 {
+
+    margin: 0;
+
+    font-size: 21px;
+
+    font-weight: 800;
+
+    color: #0f172a;
+
+}
+
+
+.table-heading p {
+
+    margin: 6px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+
+.table-count {
+
+    padding: 8px 13px;
+
+    border-radius: 9px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+/* ================================================= */
+/* TABLE SCROLL */
+/* ================================================= */
+
+.table-scroll {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+/* ================================================= */
+/* TABLE */
+/* ================================================= */
+
+.department-table {
+
+    width: 100%;
+
+    min-width: 1300px;
+
+    border-collapse: collapse;
+
+}
+
+
+/* ================================================= */
+/* TABLE HEADER */
+/* ================================================= */
+
+.department-table th {
+
+    padding: 14px 15px;
+
+    background: #f8fafc;
+
+    color: #475569;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-align: left;
+
+    text-transform: uppercase;
+
+    letter-spacing: .5px;
+
+    white-space: nowrap;
+
+    border-bottom:
+        1px solid #e2e8f0;
+
+}
+
+
+/* ================================================= */
+/* TABLE BODY */
+/* ================================================= */
+
+.department-table td {
+
+    padding: 15px;
+
+    font-size: 13px;
+
+    color: #334155;
+
+    white-space: nowrap;
+
+    border-bottom:
+        1px solid #eef2f7;
+
+}
+
+
+.department-table tbody tr {
+
+    transition:
+        background .15s ease;
+
+}
+
+
+.department-table tbody tr:hover {
+
+    background: #f8fafc;
+
+}
+
+
+/* ================================================= */
+/* ATTENDANCE VALUES */
+/* ================================================= */
+
+.attendance-number {
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    color: #0f172a;
+
+}
+
+
+.prediction-number {
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    color: #0f172a;
+
+}
+
+
+.month-value {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #475569;
+
+}
+
+
+.not-available {
+
+    color: #94a3b8;
+
+    font-weight: 600;
+
+}
+
+
+/* ================================================= */
+/* BADGES */
+/* ================================================= */
+
+.attendance-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 65px;
+
+    padding: 6px 11px;
+
+    border-radius: 20px;
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+}
+
+
+/* Attendance Level */
+
+.level-high {
+
+    background: #dcfce7;
+
+    color: #166534;
+
+}
+
+
+.level-medium {
+
+    background: #fef3c7;
+
+    color: #92400e;
+
+}
+
+
+.level-low {
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+}
+
+
+/* Status */
+
+.status-safe {
+
+    background: #dcfce7;
+
+    color: #166534;
+
+}
+
+
+.status-risk {
+
+    background: #fef3c7;
+
+    color: #92400e;
+
+}
+
+
+.status-danger {
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+}
+
+
+/* ================================================= */
+/* EMPTY */
+/* ================================================= */
+
+.empty-attendance {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    padding: 70px 30px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 25px
+        rgba(15, 23, 42, 0.05);
+
+}
+
+
+.empty-icon {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 9px 15px;
+
+    margin-bottom: 15px;
+
+    border-radius: 8px;
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+.empty-attendance h2 {
+
+    margin: 0 0 8px;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    color: #0f172a;
+
+}
+
+
+.empty-attendance p {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+}
+
+
+/* ================================================= */
+/* ACTION */
+/* ================================================= */
+
+.department-actions {
+
+    margin-top: 25px;
+
+}
+
+
+.back-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 11px 18px;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    background: #f1f5f9;
+
+    color: #334155;
+
+    border: 1px solid #e2e8f0;
+
+    transition:
+        all .2s ease;
+
+}
+
+
+.back-button:hover {
+
+    background: #e2e8f0;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* ================================================= */
+/* RESPONSIVE */
+/* ================================================= */
+
+@media (max-width: 850px) {
+
+    .department-attendance-page
+    .page-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .attendance-info-card {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .table-heading {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .department-attendance-page
+    .page-header h1 {
+
+        font-size: 27px;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}

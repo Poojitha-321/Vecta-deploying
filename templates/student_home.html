@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="student-home">
+
+    <!-- HERO -->
+
+    <section class="home-hero">
+
+        <div class="home-hero-text">
+
+            <h2>VECTA</h2>
+
+            <div class="small-title">
+                Student Portal
+            </div>
+
+            <h1>
+                Welcome,
+                {{ student["Name"] }}
+            </h1>
+
+            <p>
+                Track your attendance, view your student
+                information and predict your future attendance
+                using the Attendance AI system.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- FEATURES -->
+
+    <div class="home-section-title">
+
+        <h2>
+            Student Portal
+        </h2>
+
+        <p>
+            Everything you need to monitor your attendance.
+        </p>
+
+    </div>
+
+
+    <div class="home-feature-grid">
+
+
+        <!-- PROFILE -->
+
+        <a
+            href="{{ url_for('profile') }}"
+            class="home-feature-card"
+        >
+
+            <h3>
+                My Profile
+            </h3>
+
+            <p>
+                View your personal information including
+                Student ID, Roll Number, Name, Email,
+                Gender, Department and Year.
+            </p>
+
+            <span class="feature-link">
+                View Profile
+            </span>
+
+        </a>
+
+
+        <!-- PREDICTION -->
+
+        <a
+            href="{{ url_for('prediction') }}"
+            class="home-feature-card"
+        >
+
+            <h3>
+                Attendance Prediction
+            </h3>
+
+            <p>
+                Select a future month and generate your
+                predicted attendance using the trained
+                forecasting model.
+            </p>
+
+            <span class="feature-link">
+                Predict Attendance
+            </span>
+
+        </a>
+
+
+        <!-- DASHBOARD -->
+
+        <a
+            href="{{ url_for('student_dashboard') }}"
+            class="home-feature-card"
+        >
+
+            <h3>
+                Attendance Dashboard
+            </h3>
+
+            <p>
+                View your historical attendance and
+                predicted attendance through graphical
+                representations.
+            </p>
+
+            <span class="feature-link">
+                View Dashboard
+            </span>
+
+        </a>
+
+
+    </div>
+
+
+    <!-- QUICK INFORMATION -->
+
+    <div class="home-section-title">
+
+        <h2>
+            Your Attendance Journey
+        </h2>
+
+        <p>
+            Use the sidebar to navigate through your portal.
+        </p>
+
+    </div>
+
+
+    <div class="dashboard-cards">
+
+
+        <!-- STUDENT ID -->
+
+        <div class="dashboard-card">
+
+            <div>
+
+                <span>
+                    Student ID
+                </span>
+
+                <strong>
+                    {{ student_id }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- DEPARTMENT -->
+
+        <div class="dashboard-card">
+
+            <div>
+
+                <span>
+                    Department
+                </span>
+
+                <strong>
+                    {{ student["Department"] }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACADEMIC YEAR -->
+
+        <div class="dashboard-card">
+
+            <div>
+
+                <span>
+                    Academic Year
+                </span>
+
+                <strong>
+                    {{ student["Year"] }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   CLEAN PROFESSIONAL OVERRIDES
+   Keeps the existing colors
+========================================================= */
+
+.home-hero {
+    justify-content: flex-start;
+}
+
+.home-feature-card {
+    position: relative;
+}
+
+.home-feature-card h3 {
+    margin-top: 0;
+}
+
+.feature-link {
+    display: inline-block;
+    margin-top: 10px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.home-feature-card:hover .feature-link {
+    color: #1d4ed8;
+}
+
+.dashboard-card {
+    justify-content: flex-start;
+}
+
+</style>
+
+{% endblock %}

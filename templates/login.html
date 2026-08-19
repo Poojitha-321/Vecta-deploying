@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Attendance AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="auth-page">
+
+    <div class="auth-container">
+
+        <!-- LEFT SIDE -->
+
+        <div class="auth-visual">
+
+            <div class="auth-visual-content">
+                <h1> VECTA</h1>
+
+                <span class="auth-badge">
+                    AI Powered Attendance
+                </span>
+
+                <h1>
+                    Attendance AI
+                </h1>
+
+                <p>
+                    Smart Student Attendance Prediction System
+                    for students and faculty.
+                </p>
+
+            </div>
+
+
+            <div class="auth-student-icon">
+                🎓
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <div class="auth-card">
+
+            <h2>
+                Welcome Back
+            </h2>
+
+            <p class="auth-description">
+                Select your portal and login to continue.
+            </p>
+
+
+            {% if error %}
+
+            <div class="alert alert-error">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            <form method="POST"
+                  action="{{ url_for('login') }}">
+
+
+                <div class="login-type-buttons">
+
+                    <button
+                        type="button"
+                        class="login-type-button active"
+                        id="studentButton"
+                        onclick="selectLogin('student')">
+
+                        🎓 Student
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="login-type-button"
+                        id="facultyButton"
+                        onclick="selectLogin('faculty')">
+
+                        👩‍🏫 Faculty
+
+                    </button>
+
+                </div>
+
+
+                <input
+                    type="hidden"
+                    name="login_type"
+                    id="login_type"
+                    value="student"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="username"
+                           id="usernameLabel">
+
+                        Student ID
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter Student ID"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter Password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="auth-button">
+
+                    Login
+
+                </button>
+
+
+            </form>
+
+
+            <p style="
+                text-align:center;
+                margin-top:20px;
+                color:#64748b;
+                font-size:13px;
+                font-weight:600;
+            "
+            id="loginHint">
+
+                Student password is the same as Student ID.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function selectLogin(type) {
+
+    const loginType =
+        document.getElementById("login_type");
+
+    const studentButton =
+        document.getElementById("studentButton");
+
+    const facultyButton =
+        document.getElementById("facultyButton");
+
+    const usernameLabel =
+        document.getElementById("usernameLabel");
+
+    const username =
+        document.getElementById("username");
+
+    const loginHint =
+        document.getElementById("loginHint");
+
+
+    loginType.value = type;
+
+
+    if (type === "student") {
+
+        studentButton.classList.add("active");
+        facultyButton.classList.remove("active");
+
+        usernameLabel.textContent =
+            "Student ID";
+
+        username.placeholder =
+            "Enter Student ID";
+
+        loginHint.textContent =
+            "Student password is the same as Student ID.";
+
+    }
+
+
+    else {
+
+        facultyButton.classList.add("active");
+        studentButton.classList.remove("active");
+
+        usernameLabel.textContent =
+            "Faculty Username";
+
+        username.placeholder =
+            "Enter Faculty Username";
+
+        loginHint.textContent =
+            "Use your faculty portal credentials.";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

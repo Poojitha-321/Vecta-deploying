@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Attendance AI
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+
+<div class="portal-layout">
+
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-brand">
+
+            <div class="sidebar-logo">
+                AI
+            </div>
+
+            <div>
+
+                <h2> VECTA
+                </h2>
+
+                <span>
+                    Smart Attendance
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        {% if session.get("student_id") %}
+
+
+        <!-- STUDENT SIDEBAR -->
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="/student-home"
+                class="{% if request.path == '/student-home' %}active{% endif %}"
+            >
+
+              
+
+                <span>
+                    <h3
+                    >Home</h3>
+                    
+                </span>
+
+            </a>
+
+
+            <a
+                href="/profile"
+                class="{% if request.path == '/profile' %}active{% endif %}"
+            >
+
+            
+                <span>
+                    <h3>Profile</h3>
+                </span>
+
+            </a>
+
+
+            <a
+                href="/prediction"
+                class="{% if request.path == '/prediction' %}active{% endif %}"
+            >
+
+
+                <span>
+                    <h3>Attendance Prediction</h3>
+                    
+                </span>
+
+            </a>
+
+
+            <a
+                href="/student-dashboard"
+                class="{% if request.path == '/student-dashboard' %}active{% endif %}"
+            >
+
+
+                <span>
+                    <h3>Dashboard</h3>
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        {% elif session.get("faculty_logged_in") %}
+
+
+        <!-- FACULTY SIDEBAR -->
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="/faculty"
+                class="{% if request.path == '/faculty' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🏠
+                </span>
+
+                <span>
+                    Home
+                </span>
+
+            </a>
+
+
+            <a
+                href="/faculty-attendance"
+                class="{% if request.path == '/faculty-attendance' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📋
+                </span>
+
+                <span>
+                    Attendance
+                </span>
+
+            </a>
+
+
+            <a
+                href="/faculty-dashboard"
+                class="{% if request.path == '/faculty-dashboard' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📊
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a
+                href="/upload-data"
+                class="{% if request.path == '/upload-data' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ⬆
+                </span>
+
+                <span>
+                    Upload Data
+                </span>
+
+            </a>
+
+
+            <a
+                href="/add-student"
+                class="{% if request.path == '/add-student' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ➕
+                </span>
+
+                <span>
+                    Add Student
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        {% endif %}
+
+
+
+        {% if session.get("student_id") or session.get("faculty_logged_in") %}
+
+        <div class="sidebar-bottom">
+
+            <a href="/logout">
+
+                <span class="nav-icon">
+                    ↪
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+
+    </aside>
+
+
+
+    <main class="main-content">
+
+        <div class="page-container">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+
+</div>
+
+
+{% block scripts %}
+{% endblock %}
+
+
+</body>
+
+</html>
